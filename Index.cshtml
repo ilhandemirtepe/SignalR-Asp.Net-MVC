@@ -1,0 +1,75 @@
+﻿
+@model WebChat.Models.UserAccount
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
+    <script src="~/SignalR/Hubs"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+    <!-- Optional theme
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">-->
+
+    <script>
+        $(function () {
+            var chat = $.connection.chatHub;
+            var $username = $('@Html.TextBoxFor(a=>a.Name)'); /*Null Değeri sürekli geliyor Neden Acaba */
+            var $message = $('#txtMessage');
+            var $messages = $('#messages');
+            $message.focus();
+            chat.client.sendMessage = function (name ,message) {
+                $messages.append('<li><strong>' + name + '</strong>' + message + '</li>');
+            };
+            $.connection.hub.start().done(function () {
+                $('#btnSendMessage').click(function () {
+
+                    chat.server.send($username.val(), $message.val());
+
+                    $message.val('').focus();
+                });
+            });
+        });
+    </script>
+
+</head>
+<body>
+
+    <section id="loginform" class="outer-wrapper">
+        <div class="inner-wrapper">
+            <div class="container">
+                <div class="row" >
+                    <div class="col-sm-6 col-sm-offset-4">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading panel text-center"> <b> Chat Programing  </b></div>
+                            <div class="panel-body">
+                                <div class="form-horizontal">
+                                
+                                    @if (Session["UserID"] != null)
+                                    {
+                                        <text >Hoş Geldiniz @Session["Name"].ToString() </text>
+                                    }
+                                    <br />
+                                            @Html.TextArea("txtMessage")
+                                  
+                                    <br />
+                                        <button class="btn btn-success" id="btnSendMessage">Gönder</button>
+                                    <br />
+                                    <br />
+                                    <div id="messages"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
